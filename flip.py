@@ -1,9 +1,8 @@
-import logging
+import logging, random
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
-import random
-
-TOKEN = "YOUR_TOKEN_HERE"
+from dotenv import load_dotenv
+from config import TOKEN, create_new_user, check_user, set_user_values, get_stats_user
 
 # Enable logging
 logging.basicConfig(
@@ -11,16 +10,19 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-#creating a "database"
-users = {}
+# translation of words to display to the user
+mapping = {
+    'heads': 'Орел',
+    'tails': 'Решка'
+}
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
 
     #adding a user to the database if it is not found there
-    if user.id not in users:
-        users[user.id] = {'Орел': 0, 'Решка': 0}
+    if not check_user(user.id):
+        create_new_user(user.id)
 
     await update.message.reply_html(
         rf"Привітик {user.mention_html()}! 😁"
@@ -29,33 +31,28 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def coin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Flip a coin when the command /coin is issued."""
-    coin = random.choice(['Орел', 'Решка'])
+    coin = random.choice(['heads', 'tails'])
     user = update.effective_user
 
-    #adding the flip result for user
-    users[user.id][coin] += 1
+    set_user_values(user.id, coin)
 
-    await update.message.reply_text(coin)
+    await update.message.reply_text(
+        "Випадає..  " + mapping.get(coin)
+    )
 
 
 async def stats(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show flip statistics when the command /stats is issued."""
     user = update.effective_user
 
-    #getting the flips for the user
-    for k, v in users[user.id].items():
-        if k == "Орел":
-            heads = v
-        elif k == "Решка":
-            tails = v
+    heads, tails = get_stats_user(user.id)
 
     await update.message.reply_text(
         "Статистика 🪙 кидків\n"
         rf"🪙 Орлів: {heads}" "\n"
         rf"🪙 Решок: {tails}" "\n"
-        rf"🪙 Всього кидків: {heads + tails}"
+        rf"🪙 Всього кидків: {int(heads) + int(tails)}"
     )
-
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
