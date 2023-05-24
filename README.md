@@ -5,12 +5,17 @@ Bot that throws a coin
 
 ## **Configuration**
  
-First you need to replace the text YOUR_TOKEN_HERE at the beginning of the file flip.py to your token that was issued to you by the bot @BotFather
+First you need to create a .env file in the directory with the rest. There you need to enter the token of your bot that was issued to you later by @BotFather
 
 **Example**
-```python
-TOKEN = "123654789:ADJnndj77da88dJJDnnakkdNNAkkAuE"
+```env
+TOKEN=123654789:ADJnndj77da88dJJDnnakkdNNAkkAuE
 ```
+
+## Configuration in config.py
+DB_NAME - database name
+
+TOKEN - token which gets in .env file
 
 ## **Running the bot**
 Installing necessary modules
