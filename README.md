@@ -24,7 +24,7 @@ pip3 install -r requirements.txt
 ```
 Run the bot
 ```
-python3 app.py
+python3 flip.py
 ```
 
 ## Bot commands:
